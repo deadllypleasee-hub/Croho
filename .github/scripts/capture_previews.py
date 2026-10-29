@@ -24,7 +24,7 @@ def screenshot(name):
     print(f"Captured {name}", flush=True)
 
 
-def tap(value):
+def locate(value):
     for _ in range(7):
         tree = nodes()
         for node in tree.iter("node"):
@@ -34,13 +34,17 @@ def tap(value):
             if len(bounds) == 4:
                 left, top, right, bottom = bounds
                 if right > left and bottom > top:
-                    adb("shell", "input", "tap", str((left + right) // 2), str((top + bottom) // 2))
-                    return
+                    return str((left + right) // 2), str((top + bottom) // 2)
         size = adb("shell", "wm", "size").decode()
         width, height = [int(n) for n in re.findall(r"(\d+)x(\d+)", size)[-1]]
         adb("shell", "input", "swipe", str(width // 2), str(height * 4 // 5),
             str(width // 2), str(height // 3), "250")
     raise RuntimeError(f"Visible app control not found: {value}")
+
+
+def tap(value):
+    x, y = locate(value)
+    adb("shell", "input", "tap", x, y)
 
 
 adb("install", "-r", "app/build/outputs/apk/debug/app-debug.apk")
@@ -58,3 +62,5 @@ for index, answer in enumerate(answers):
 screenshot("04-result")
 tap("К ленте времени")
 screenshot("05-rewards")
+locate("Открыть главу")
+screenshot("06-epochs")

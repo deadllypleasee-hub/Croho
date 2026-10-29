@@ -322,21 +322,29 @@ public class MainActivity extends Activity {
     private void renderQuiz() {
         if (session.finished()) { renderResult(); return; }
         page();
-        button(content, "‹  К ленте времени", false, this::renderHome);
-        gap(content, 22);
         LinearLayout top = row(content);
+        Button back = button(top, "‹", false, this::renderHome);
+        back.setContentDescription("К ленте времени");
+        back.setTextSize(30);
+        back.setPadding(0, 0, 0, 0);
+        back.setMinHeight(dp(48));
+        back.setLayoutParams(new LinearLayout.LayoutParams(dp(44), dp(48)));
         LinearLayout topText = column();
-        top.addView(topText, new LinearLayout.LayoutParams(0, -2, 1f));
+        LinearLayout.LayoutParams headingParams = new LinearLayout.LayoutParams(0, -2, 1f);
+        headingParams.leftMargin = dp(12);
+        headingParams.rightMargin = dp(4);
+        top.addView(topText, headingParams);
         pill(topText, session.level == -1 ? "ФИНАЛЬНЫЙ ЭКЗАМЕН" : "ГЛАВА " + (session.level + 1), PURPLE, 0xFFECE6FF);
-        gap(topText, 9);
-        label(topText, session.level == -1 ? "Всемирная история" : Catalog.TITLES[session.level], 20, INK, true);
-        art(top, session.level == -1 ? GameArtView.TROPHY : session.level, 56);
-        gap(content, 20);
+        gap(topText, 6);
+        label(topText, session.level == -1 ? "Всемирная история" : Catalog.TITLES[session.level], 18, INK, true);
+        art(top, session.level == -1 ? GameArtView.TROPHY : session.level, 40);
+        gap(content, 14);
         label(content, "Вопрос " + (session.position() + 1) + " из " + session.questions.size() + "     ·     Верно: " + session.score(), 13, MUTED, true);
         progressBar(content, session.position(), session.questions.size(), PURPLE, BORDER);
         final Question question = session.current();
         LinearLayout promptCard = card(Color.WHITE);
-        label(promptCard, question.text, 23, INK, true).setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        promptCard.setPadding(dp(18), dp(16), dp(18), dp(16));
+        label(promptCard, question.text, 22, INK, true).setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         gap(content, 4);
         int selected = session.selected();
         for (int choice = 0; choice < question.options.size(); choice++) {
