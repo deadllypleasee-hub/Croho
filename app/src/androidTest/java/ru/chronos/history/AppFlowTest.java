@@ -1,6 +1,7 @@
 package ru.chronos.history;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,20 @@ public class AppFlowTest {
         assertTrue(view.performClick());
     }
 
+    private interface ScreenCondition { boolean ready(MainActivity activity); }
+
+    private static void awaitScreen(ActivityScenario<MainActivity> scenario,
+                                    ScreenCondition condition, String message) {
+        long deadline = SystemClock.uptimeMillis() + 5000;
+        boolean[] ready = {false};
+        do {
+            scenario.onActivity(activity -> ready[0] = condition.ready(activity));
+            if (ready[0]) return;
+            SystemClock.sleep(25);
+        } while (SystemClock.uptimeMillis() < deadline);
+        fail(message);
+    }
+
     @Test public void systemBackKeepsAnswerAndHomeStateAcrossRelaunch() {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {
@@ -47,8 +62,12 @@ public class AppFlowTest {
                 activity.findViewById(android.R.id.content)
                         .findViewWithTag("answer_" + Catalog.byId(0).correct).performClick();
             });
+            // RESUMED alone does not guarantee that the window can receive injected keys.
+            awaitScreen(scenario, MainActivity::hasWindowFocus, "Quiz window did not receive focus");
             InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+            awaitScreen(scenario,
+                    activity -> text(activity.findViewById(android.R.id.content), "CHRONOS") != null,
+                    "System Back did not return to the home screen");
             scenario.onActivity(activity -> {
                 assertNotNull(text(activity.findViewById(android.R.id.content), "CHRONOS"));
                 assertNotNull(text(activity.findViewById(android.R.id.content), "Продолжить · глава 1"));
