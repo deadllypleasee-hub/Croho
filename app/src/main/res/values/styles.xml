@@ -1,10 +1,10 @@
 <resources>
-    <style name="Theme.Chronos" parent="android:style/Theme.Material.NoActionBar">
+    <style name="Theme.Chronos" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:colorAccent">#E7BF75</item>
-        <item name="android:windowBackground">#101821</item>
-        <item name="android:statusBarColor">#101821</item>
-        <item name="android:navigationBarColor">#101821</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">#694CDF</item>
+        <item name="android:windowBackground">#F6F7FC</item>
+        <item name="android:statusBarColor">#F6F7FC</item>
+        <item name="android:navigationBarColor">#252948</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

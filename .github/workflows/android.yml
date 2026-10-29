@@ -43,7 +43,9 @@ jobs:
           target: google_apis
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: ./gradlew --no-daemon connectedDebugAndroidTest
+          script: |
+            ./gradlew --no-daemon connectedDebugAndroidTest
+            python3 .github/scripts/capture_previews.py
       - name: Prepare installable APK
         run: |
           mkdir -p dist
