@@ -209,6 +209,8 @@ public class MainActivity extends Activity {
         }
         gap(content, 28);
         label(content, "Работает офлайн. Прогресс хранится на этом устройстве.", 13, MUTED, false);
+        gap(content, 12);
+        label(content, getString(R.string.developer_credit), 14, GOLD, false);
         button(content, "Сбросить прогресс", false, () -> new AlertDialog.Builder(this)
                 .setTitle("Сбросить весь прогресс?")
                 .setMessage("Результаты глав, экзамена и текущая попытка будут удалены с устройства.")

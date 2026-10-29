@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CHRONOS</string>
+    <string name="developer_credit">Разработчик: Шафенков Владимир</string>
 </resources>
