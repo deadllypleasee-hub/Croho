@@ -57,6 +57,10 @@ answers = ["Тигр и Евфрат", "Иероглифы", "Хаммурапи
 for index, answer in enumerate(answers):
     tap(answer)
     if index == 0:
+        # Check disk persistence after the real app process is killed, not only Activity recreation.
+        adb("shell", "am", "force-stop", "ru.chronos.history")
+        adb("shell", "am", "start", "-W", "-n", "ru.chronos.history/.MainActivity")
+        locate(answer + ". Правильный ответ")
         screenshot("03-feedback")
     tap("Показать результат" if index == 4 else "Следующий вопрос")
 screenshot("04-result")

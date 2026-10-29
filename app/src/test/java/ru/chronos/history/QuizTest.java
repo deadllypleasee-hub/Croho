@@ -94,4 +94,17 @@ public class QuizTest {
         assertEquals(18, progress.examBest());
         assertThrows(IllegalArgumentException.class, () -> progress.record(-1, 21));
     }
+
+    @Test public void finalExamNeedsAtLeastSixteenCorrectAnswers() {
+        for (int correctAnswers : new int[] {15, 16}) {
+            QuizSession exam = new QuizSession(-1, Catalog.exam(new Random(42)));
+            for (int i = 0; i < 20; i++) {
+                int correct = exam.current().correct;
+                exam.answer(i < correctAnswers ? correct : (correct + 1) % 4);
+                exam.next();
+            }
+            assertEquals(correctAnswers, exam.score());
+            assertEquals(correctAnswers == 16, exam.passed());
+        }
+    }
 }

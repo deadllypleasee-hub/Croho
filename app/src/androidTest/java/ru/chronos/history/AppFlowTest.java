@@ -1,6 +1,7 @@
 package ru.chronos.history;
 
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -37,6 +38,44 @@ public class AppFlowTest {
         View view = text(activity.findViewById(android.R.id.content), value);
         assertNotNull("Missing button: " + value, view);
         assertTrue(view.performClick());
+    }
+
+    @Test public void systemBackKeepsAnswerAndHomeStateAcrossRelaunch() {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(activity -> {
+                click(activity, "Начать путешествие");
+                activity.findViewById(android.R.id.content)
+                        .findViewWithTag("answer_" + Catalog.byId(0).correct).performClick();
+            });
+            InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+            scenario.onActivity(activity -> {
+                assertNotNull(text(activity.findViewById(android.R.id.content), "CHRONOS"));
+                assertNotNull(text(activity.findViewById(android.R.id.content), "Продолжить · глава 1"));
+                assertFalse(new ProgressStore(activity).showingQuiz());
+            });
+        }
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(activity -> {
+                assertNotNull(text(activity.findViewById(android.R.id.content), "CHRONOS"));
+                click(activity, "Продолжить · глава 1");
+                QuizSession restored = new ProgressStore(activity).loadSession();
+                assertNotNull(restored);
+                assertEquals(0, restored.position());
+                assertEquals(Catalog.byId(0).correct, restored.selected());
+                assertEquals(1, restored.score());
+                activity.findViewById(android.R.id.content).findViewWithTag("next").performClick();
+            });
+            scenario.recreate();
+            scenario.onActivity(activity -> {
+                QuizSession restored = new ProgressStore(activity).loadSession();
+                assertNotNull(restored);
+                assertEquals(1, restored.position());
+                assertEquals(-1, restored.selected());
+                assertEquals(1, restored.score());
+                assertNull(activity.findViewById(android.R.id.content).findViewWithTag("next"));
+            });
+        }
     }
 
     @Test public void attemptSurvivesRecreationAndRelaunchAndUnlocksNextChapter() {
